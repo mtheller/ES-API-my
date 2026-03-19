@@ -3,3 +3,4 @@
 *.xlsx
 Results/
 api.venv/
+*.exe
