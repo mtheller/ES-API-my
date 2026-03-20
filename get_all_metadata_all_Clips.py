@@ -108,6 +108,7 @@ all_keys = set()
 
 for clip_counter, clip in enumerate(all_clips, start=1):
     clip_metadata = metadata_api.get_clip(clip)
+    clip_metadata.get("asset", {}).pop("customtypes", None)
 
     asset_custom = clip_metadata.get("asset", {}).get("custom", {})
     # optional: zusätzlich lesbare Custom-Namen in die Metadaten hängen
@@ -141,6 +142,7 @@ with open(csv_path, mode, newline="", encoding="utf-8") as f:
 
     for clip_counter, clip in enumerate(all_clips, start=1):
         clip_metadata = metadata_api.get_clip(clip)
+        clip_metadata.get("asset", {}).pop("customtypes", None)
 
         asset_custom = clip_metadata.get("asset", {}).get("custom", {})
         custom_values_named = {
