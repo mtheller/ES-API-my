@@ -1,4 +1,4 @@
 *.env
 *.csv
 Results/
-venv/
+venv.venv/
