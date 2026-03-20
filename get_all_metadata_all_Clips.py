@@ -14,12 +14,14 @@ metadata_api = FlowAPI.Metadata.create_gateway_instance(
     os.environ["FLOW_USER"], os.environ["FLOW_PASSWORD"], os.environ["FLOW_HOST"]
 )
 
+
 # --------- CONFIG ---------
 tmp_path   = Path(__file__).parent / "result_tmp.csv"
 final_path = Path(__file__).parent / "result_all_metadata_all_clips.csv"
 #limit  = metadata_api.numClips()
 limit = 500
 offset = 0
+
 
 # --------- FUNC ---------
 def duration_to_h(start_tc: str, end_tc: str) -> str:
@@ -80,14 +82,14 @@ def pretty_header_name(col: str) -> str:
 def natural_sort_key(s):
     return [int(c) if c.isdigit() else c.lower() for c in re.split(r'(\d+)', s)]
 
+
 # --------- MAIN ---------
 all_clips   = metadata_api.clips(offset=offset, limit=limit)
 total_clips = len(all_clips)
 
 custom_field_definitions = metadata_api.getCustomMetadataFields()
 dbkey_to_name = {f["db_key"]: f["name"] for f in custom_field_definitions}
-
-fieldnames = []
+fieldnames = [f"asset_custom_named.{name}" for name in dbkey_to_name.values()]
 
 with open(tmp_path, "w", newline="", encoding="utf-8") as f:
     writer = None
@@ -127,6 +129,7 @@ with open(tmp_path, "w", newline="", encoding="utf-8") as f:
         os.fsync(f.fileno())
         print(f"Clip {clip_counter} von {total_clips} geschrieben ({len(new_keys)} neue Felder)")
 
+
 # --------- Finale CSV: Header sortieren, fehlende Values auffüllen ---------
 print("Erzeuge finale CSV...")
 
@@ -143,3 +146,6 @@ with open(final_path, "w", newline="", encoding="utf-8") as f_out:
         writer.writerow({k: row.get(k, "") for k in sorted_fieldnames})
 
 print(f"✓ Fertig: {final_path}")
+
+tmp_path.unlink()
+print(f"✓ Temporäre Datei gelöscht: {tmp_path}")
